@@ -43,6 +43,19 @@ jobs:
         run: python -m pip install nox
       - name: Execute Tests
         run: nox --error-on-missing-interpreters --non-interactive --session tests-${{ matrix.python-version }}
+  msstore:
+    # Checks that pipx works with Python installed from the Microsoft Store.
+    # Designed to catch issues such as https://github.com/pypa/pipx/issues/1164.
+    runs-on: windows-latest
+    steps:
+      - uses: Cyberboss/install-winget@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: winget install python --source=msstore --disable-interactivity --accept-source-agreements --accept-package-agreements
+      - uses: actions/checkout@v4
+      - run: pip install .
+      - run: pipx install pycowsay
+      - run: pycowsay
   man:
     name: Build man page
     runs-on: ubuntu-latest
